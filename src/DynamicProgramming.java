@@ -97,7 +97,9 @@ public class DynamicProgramming {
 			if(currentIndex + 1 < M[i].length) upRight = M[i - 1][currentIndex + 1];
 			upCenter = M[i - 1][currentIndex];
 			
-			if((upLeft == upCenter) || (upCenter == upRight) || (upRight == upLeft)) {
+			if(((upLeft == upCenter && upLeft != Integer.MAX_VALUE) 
+					|| (upCenter == upRight && upCenter != Integer.MAX_VALUE) 
+					|| (upRight == upLeft && upRight != Integer.MAX_VALUE))) {
 				int min = getMinThree(upLeft, upCenter, upRight);
 				
 				if(i - 2 >= 0) {

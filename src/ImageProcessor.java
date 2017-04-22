@@ -29,6 +29,17 @@ public class ImageProcessor {
     		ArrayList<Integer> vc = DynamicProgramming.minCostVC(I);
     		
     		I = cutImage(I, vc);
+    		
+//    		Picture tmp = new Picture(picture.width() - 1, picture.height());
+//    		
+//    		for(int n = 0; n < tmp.width(); n++) {
+//    			for(int j = 0; j < tmp.height(); j++) {
+//    				tmp.set(n, j, reducedPicture[j][n]);
+//    			}
+//    		}
+//    		
+//    		picture = tmp;
+//    		I = createImportanceArray();
     	}
     	
     	Picture retval = new Picture(picture.width() - removedColumns, picture.height());
@@ -39,7 +50,7 @@ public class ImageProcessor {
     		}
     	}
     	
-        return retval;
+        return picture;
     }
     
     private static int[][] createImportanceArray() {
@@ -115,9 +126,9 @@ public class ImageProcessor {
     	Color[][] currentPicture = reducedPicture;
     	reducedPicture = new Color[height][width - 1];
     	
-    	for(int i = 0; i < I.length; i++) {
+    	for(int i = 0; i < height; i++) {
     		int colIndex = cut.get((2 * i) + 1);
-    		for(int j = 0; j < I[0].length; j++) {
+    		for(int j = 0; j < width; j++) {
     			if(j != colIndex) {
     				if(j < colIndex) {
     					retval[i][j] = I[i][j];
