@@ -69,6 +69,7 @@ public class DynamicProgramming {
      * @return d returns a string z (obtained by inserting $ at n − m indices in y) such that AlignCost(x, z) ≤ AlignCost(x, y) over all possible y
      */
     public static String stringAlignment(String x, String y) {
+        String result = "";
         col = x.length();
         dif = Math.abs(x.length() - y.length());
         lastUsed = x.length() * 2;
@@ -76,7 +77,11 @@ public class DynamicProgramming {
         init_all();
         constructGrid(x, y);
         char[] sol = indexGrid(x, y, m);
-        return Arrays.toString(fillEmptyCells(sol));
+        char[] resultArray = fillEmptyCells(sol);
+        for(char c : resultArray) {
+            result += c;
+        }
+        return result;
     }
     
     private static CostPair findCheapestPath(int[][] M, int startIndex) {
