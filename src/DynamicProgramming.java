@@ -22,13 +22,6 @@ public class DynamicProgramming {
      * @return a min-cost vertical cut.
      */
     public static ArrayList<Integer> minCostVC(int[][] M) {
-<<<<<<< HEAD
-        //for loop though top row.
-        //for loop through other col
-                //for loop through other row
-        //get the min cost by comparing the row cost compared to the top row.
-        return null;
-=======
     	int rows = M.length;
     	int columns = M[0].length;
     	
@@ -68,7 +61,6 @@ public class DynamicProgramming {
     	}
     	
     	return retval;
->>>>>>> 0d975f8a3dbb7a294adca31600d2bcc3fafc1982
     }
 
     /**
