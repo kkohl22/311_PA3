@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 /**
- * Created by Ken Kohl on 4/12/2017.
+ * Created by Ken Kohl and Jeff Murray on 4/12/2017.
  */
 public class ImageProcessor {
 
@@ -19,32 +19,21 @@ public class ImageProcessor {
     }
 
     /**
-     *
-     * @param x
-     * @return
+     * Method that takes a percentage as input and returns an image that is reduced to that percentage of the previous width.
+     * @param x	the percentage to reduce the image width to.
+     * @return	the newly reduced image.
      */
     public static Picture reduceWidth(double x) {
     	int[][] I = createImportanceArray();
-    	int removedColumns = (int) Math.ceil(picture.width() * x);
+    	int removedColumns = picture.width() - ((int) Math.ceil(picture.width() * x));
     	
     	for(int i = 0; i < removedColumns; i++) {
     		ArrayList<Integer> vc = DynamicProgramming.minCostVC(I);
     		
     		I = cutImage(I, vc);
-    		
-//    		Picture tmp = new Picture(picture.width() - 1, picture.height());
-//    		
-//    		for(int n = 0; n < tmp.width(); n++) {
-//    			for(int j = 0; j < tmp.height(); j++) {
-//    				tmp.set(n, j, reducedPicture[j][n]);
-//    			}
-//    		}
-//    		
-//    		picture = tmp;
-//    		I = createImportanceArray();
     	}
     	
-    	Picture retval = new Picture(picture.width() - removedColumns, picture.height());
+    	Picture retval = new Picture((int) Math.ceil(picture.width() * x), picture.height());
     	
     	for(int i = 0; i < reducedPicture.length; i++) {
     		for(int j = 0; j < reducedPicture[0].length; j++) {
@@ -52,9 +41,13 @@ public class ImageProcessor {
     		}
     	}
     	
-        return picture;
+        return retval;
     }
     
+    /**
+     * Method that creates an Importance matrix for the image.
+     * @return	the created Importance array.
+     */
     private static int[][] createImportanceArray() {
     	int width = picture.width();
     	int height = picture.height();
@@ -98,7 +91,7 @@ public class ImageProcessor {
     				rightPixel = picture.get(0, i);
     			}
     			
-    			importance = distance(leftPixel, rightPixel) + distance(upPixel, downPixel);
+    			importance = difference(leftPixel, rightPixel) + difference(upPixel, downPixel);
     			retval[i][j] = importance;
     		}
     	}
@@ -106,7 +99,13 @@ public class ImageProcessor {
     	return retval;
     }
 
-    private static int distance(Color c1, Color c2) {
+    /**
+     * Method that determines the level of difference between two colors.
+     * @param c1	the first color.
+     * @param c2	the second color.
+     * @return	the difference between the two inputted color.
+     */
+    private static int difference(Color c1, Color c2) {
     	int rval = 0;
     	int gval = 0;
     	int bval = 0;
@@ -121,15 +120,27 @@ public class ImageProcessor {
     	return rval + gval + bval;
     }
     
+    /**
+     * Method that takes the Importance array generated and the generated vertical cut and creates a new Importance array
+     * and image created by reducing by that cut.
+     * @param I	the Importance array to be reduced.
+     * @param cut	the cut to use to reduce the Importance array and image.
+     * @return	the newly cut Importance array.
+     */
     private static int[][] cutImage(int[][] I, ArrayList<Integer> cut) {
     	int height = I.length;
     	int width = I[0].length;
-    	int[][] retval = new int[height][width - 1];
     	Color[][] currentPicture = reducedPicture;
+    	
+    	// Create a new Color array and integer array to represent the cut image and importance arrays
     	reducedPicture = new Color[height][width - 1];
+    	int[][] retval = new int[height][width - 1];
     	
     	for(int i = 0; i < height; i++) {
+    		// Index of the item to be cut from this row
     		int colIndex = cut.get((2 * i) + 1);
+    		
+    		// Copy values from I and currentPicture to retval and reducedPicture, skipping over the item in the cut
     		for(int j = 0; j < width; j++) {
     			if(j != colIndex) {
     				if(j < colIndex) {
@@ -142,12 +153,6 @@ public class ImageProcessor {
     				}
     			}
     		}
-    		
-//    		System.arraycopy(I[i], 0, retval[i], 0, colIndex + 1);
-//    		System.arraycopy(I[i], colIndex + 1, retval[i], colIndex, ((width - 1) - (colIndex + 1)));
-//    		
-//    		System.arraycopy(currentPicture[i], 0, reducedPicture[i], 0, colIndex + 1);
-//    		System.arraycopy(currentPicture[i], colIndex + 1, reducedPicture[i], colIndex, ((width - 1) - (colIndex + 1)));
     	}
     	
     	return retval;

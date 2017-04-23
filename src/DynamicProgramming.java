@@ -1,24 +1,18 @@
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Stack;
 
 /**
- * Created by Ken Kohl on 4/12/2017.
+ * Created by Ken Kohl and Jeff Murray on 4/12/2017.
  */
 public class DynamicProgramming {
     private static int lastUsed;
     private static int[][] m;
     private static int col;
-    private static int cost = 0;
     private static int dif;
-    private static LinkedList<CostPair> costs = new LinkedList<CostPair>();
-
+    
     /**
-     * @param M
+     * Method that given a 2D array of integers, finds the smallest costing path from top to bottom.
+     * @param M	the matrix to create the vertical cut from.
      * @return a min-cost vertical cut.
      */
     public static ArrayList<Integer> minCostVC(int[][] M) {
@@ -41,17 +35,20 @@ public class DynamicProgramming {
     		}
     	}
     	
+    	// Iterate through smallest end points and pick one to use.
     	int minCost = Integer.MAX_VALUE;
     	CostPair minPair = new CostPair();
     	for(int i = 0; i < minEndPoints.size(); i++) {
     		CostPair pair = findCheapestPath(M, minEndPoints.get(i));
     		
-    		if(pair.getCost() < minCost) {
+    		// Defaults to the rightmost value that has a minimum cost path if there are multiple of the same cost
+    		if(pair.getCost() <= minCost) {
     			minCost = pair.getCost();
     			minPair = pair;
     		}
     	}
     	
+    	// Create the path to return
     	ArrayList<Integer> minPath = minPair.getPath();
     	Collections.reverse(minPath);
     	ArrayList<Integer> retval = new ArrayList<Integer>();
@@ -84,24 +81,33 @@ public class DynamicProgramming {
         return result;
     }
     
+    /**
+     * Method that starts from a specific index on the bottom row of the matrix and finds the cheapest path to the top.
+     * @param M	the array to find a path through.
+     * @param startIndex the index on the bottom row to start the path from.
+     * @return	the resulting CostPair representing the path and the cost of that path.	
+     */
     private static CostPair findCheapestPath(int[][] M, int startIndex) {
     	int rows = M.length;
     	int columns = M[0].length;
     	int currentIndex = startIndex;
     	CostPair pair = new CostPair();
     	
+    	// Iterate through the grid in reverse, as the bottom values have the most weight
     	for(int i = rows - 1; i > 0; i--) {
-    		//pair.addToPath(M[i][currentIndex]);
     		pair.addToPath(currentIndex);
     		pair.addToCost(M[i][currentIndex] * i);
     		
     		int upLeft, upCenter, upRight;
     		upLeft = upCenter = upRight = Integer.MAX_VALUE;
     		
+    		// Try to obtain elements diagonally above and left, straight above, and diagonally above and right
 			if(currentIndex - 1 >= 0) upLeft = M[i - 1][currentIndex - 1];
 			if(currentIndex + 1 < M[i].length) upRight = M[i - 1][currentIndex + 1];
 			upCenter = M[i - 1][currentIndex];
 			
+			
+			// If there are duplicate values, determine which of the options is best
 			if(((upLeft == upCenter && upLeft != Integer.MAX_VALUE) 
 					|| (upCenter == upRight && upCenter != Integer.MAX_VALUE) 
 					|| (upRight == upLeft && upRight != Integer.MAX_VALUE))) {
@@ -139,6 +145,7 @@ public class DynamicProgramming {
 					else if(minIndex == 3 && upRight == upCenter) currentIndex++;
 				}
 			}
+			// Otherwise determine the minimum value and choose it
 			else {
 				int min = getMinThree(upLeft, upCenter, upRight);
 				
@@ -147,24 +154,40 @@ public class DynamicProgramming {
 				// Otherwise currentIndex is the same
 			}
     	}
-    	//pair.addToPath(M[0][currentIndex]);
     	pair.addToPath(currentIndex);
     	
     	return pair;
+    	
     }
     
+    /**
+     * Method that determines the smallest element of three inputs.
+     * @param a	the first element.
+     * @param b	the second element.
+     * @param c	the third element.
+     * @return	the smallest element present.
+     */
     private static int getMinThree(int a, int b, int c) {
+    	if(a < 0) a = Integer.MAX_VALUE;
+    	if(b < 0) b = Integer.MAX_VALUE;
+    	if(c < 0) c = Integer.MAX_VALUE;
+    	
     	if(a <= b && a <= c) return a;
 		else if(b <= a && b <= c) return b;
     	return c;
     }
     
+    /**
+     * Method that determines the index of the smallest element in an ArrayList of Integers.
+     * @param list	the list to iterate through.
+     * @return	the index of the smallest element present in this ArrayList.
+     */
     private static int getMinIndex(ArrayList<Integer> list) {
     	int min = Integer.MAX_VALUE;
     	int minIndex = -1;
     	
     	for(int i = 0; i < list.size(); i++) {
-    		if(list.get(i) < min) {
+    		if(list.get(i) <= min) {
     			min = list.get(i);
     			minIndex = i;
     		}
@@ -226,23 +249,4 @@ public class DynamicProgramming {
             }
         }
     }
-
-    private static int getCost(String a, String b) {
-        int totalCost = 0;
-        if (a.length() == b.length()) {
-            char s1[] = a.toCharArray();
-            char s2[] = b.toCharArray();
-            for (int i = 0; i < a.length(); i++) {
-                if (s2[i] == '$') {
-                    totalCost += 4;
-                } else if (s1[i] != s2[i]) {
-                    totalCost += 2;
-                }
-            }
-            return totalCost;
-        }
-        return -1;
-    }
-
-
 }
